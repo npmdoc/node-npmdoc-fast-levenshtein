@@ -1,0 +1,196 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/hiddentao/fast-levenshtein#readme">fast-levenshtein (v2.0.6)</a>
+</h1>
+<h4>Efficient implementation of Levenshtein algorithm  with locale-specific collator support.</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.fast-levenshtein">module fast-levenshtein</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.fast-levenshtein.get">
+            function <span class="apidocSignatureSpan">fast-levenshtein.</span>get
+            <span class="apidocSignatureSpan">(str1, str2, options)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.fast-levenshtein" id="apidoc.module.fast-levenshtein">module fast-levenshtein</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.fast-levenshtein.get" id="apidoc.element.fast-levenshtein.get">
+        function <span class="apidocSignatureSpan">fast-levenshtein.</span>get
+        <span class="apidocSignatureSpan">(str1, str2, options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">get = function (str1, str2, options) {
+  var useCollator = (options &amp;&amp; collator &amp;&amp; options.useCollator);
+
+  var str1Len = str1.length,
+    str2Len = str2.length;
+
+  // base cases
+  if (str1Len === 0) return str2Len;
+  if (str2Len === 0) return str1Len;
+
+  // two rows
+  var curCol, nextCol, i, j, tmp;
+
+  // initialise previous row
+  for (i=0; i&lt;str2Len; ++i) {
+    prevRow[i] = i;
+    str2Char[i] = str2.charCodeAt(i);
+  }
+  prevRow[str2Len] = str2Len;
+
+  var strCmp;
+  if (useCollator) {
+    // calculate current row distance from previous row using collator
+    for (i = 0; i &lt; str1Len; ++i) {
+      nextCol = i + 1;
+
+      for (j = 0; j &lt; str2Len; ++j) {
+        curCol = nextCol;
+
+        // substution
+        strCmp = 0 === collator.compare(str1.charAt(i), String.fromCharCode(str2Char[j]));
+
+        nextCol = prevRow[j] + (strCmp ? 0 : 1);
+
+        // insertion
+        tmp = curCol + 1;
+        if (nextCol &gt; tmp) {
+          nextCol = tmp;
+        }
+        // deletion
+        tmp = prevRow[j + 1] + 1;
+        if (nextCol &gt; tmp) {
+          nextCol = tmp;
+        }
+
+        // copy current col value into previous (in preparation for next iteration)
+        prevRow[j] = curCol;
+      }
+
+      // copy last col value into previous (in preparation for next iteration)
+      prevRow[j] = nextCol;
+    }
+  }
+  else {
+    // calculate current row distance from previous row without collator
+    for (i = 0; i &lt; str1Len; ++i) {
+      nextCol = i + 1;
+
+      for (j = 0; j &lt; str2Len; ++j) {
+        curCol = nextCol;
+
+        // substution
+        strCmp = str1.charCodeAt(i) === str2Char[j];
+
+        nextCol = prevRow[j] + (strCmp ? 0 : 1);
+
+        // insertion
+        tmp = curCol + 1;
+        if (nextCol &gt; tmp) {
+          nextCol = tmp;
+        }
+        // deletion
+        tmp = prevRow[j + 1] + 1;
+        if (nextCol &gt; tmp) {
+          nextCol = tmp;
+        }
+
+        // copy current col value into previous (in preparation for next iteration)
+        prevRow[j] = curCol;
+      }
+
+      // copy last col value into previous (in preparation for next iteration)
+      prevRow[j] = nextCol;
+    }
+  }
+  return nextCol;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+## Examples
+
+**Default usage**
+
+```javascript
+var levenshtein = require('fast-levenshtein');
+
+var distance = levenshtein.<span class="apidocCodeKeywordSpan">get</span>('back', 'book');   // 2
+var distance = levenshtein.get('æˆ‘æ„›ä½&nbsp;', 'æˆ‘å«ä½&nbsp;');   // 1
+```
+
+**Locale-sensitive string comparisons**
+
+It supports using [Intl.Collator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Collator) for
+ locale-sensitive  string comparisons:
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
